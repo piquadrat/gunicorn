@@ -4,6 +4,7 @@
 # See the NOTICE for more information.
 
 import datetime
+import errno
 import logging
 logging.Logger.manager.emittedNoHandlerWarning = 1
 from logging.config import fileConfig
@@ -341,7 +342,11 @@ class Logger(object):
                     handler.acquire()
                     try:
                         if handler.stream:
-                            util.close_on_exec(handler.stream.fileno())
+                            try:
+                                util.close_on_exec(handler.stream.fileno())
+                            except IOError as e:
+                                if e.errno != errno.EBADF:
+                                    raise
                     finally:
                         handler.release()
 
