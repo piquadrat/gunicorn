@@ -111,7 +111,9 @@ def reload_django_settings():
 
 def make_command_wsgi_application(admin_mediapath):
     reload_django_settings()
-
+    from cms import conf
+    conf.patch_settings.ALREADY_PATCHED = False
+    conf.patch_settings()
     try:
         from django.core.servers.basehttp import AdminMediaHandler
         return AdminMediaHandler(make_wsgi_application(), admin_mediapath)
